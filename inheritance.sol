@@ -1,88 +1,87 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-contract tips{
+contract inheritance { //ชื่อ
+     address owner; //ที่อยู่ กับ เจ้าของ
+     Inheritor[] inheritor;
 
-    address owner;
-    Waitress[] waitress;
-    
-
-    constructor(){
+    constructor(){ //วิ่งครั้งแรก
         owner = msg.sender;
     }
-
-    //1.ใส่เงินเข้าไปในกระปุก
+ //1. put fund in smart contract
 
     function addtips() payable public {
 
     }
-    //สามารถรับเงินได้ คือ payable เป็น public
-    //2.สามารถดูเงินในกระปุกได้ว่ามีเท่าไหร่
 
-    function viewtips() public view returns (uint){
-        return address(this).balance;
-    }
+    //2. view balance
 
-    //3.เพิ่มคนที่จะได้รับทิป structure waitress
-    struct Waitress{
-        address payable  walletAddress;
+    function viewtips() public view returns(uint){
+        return address(this).balance;  
+     }
+
+    //3.1 add structure inheritor
+    struct Inheritor{
+        address payable inheritorAddress;
         string name;
     }
 
-    //3.2 add waitress
-    function addWaitress(address payable  walletAddress,string memory name)public {
-        require(msg.sender == owner,"Only the owner can call this function");
-        bool waitressExist = false;
+    //3.2 add inheritor
+    function addInheritor(address payable inheritorAddress,string memory name) public {
+        require(msg.sender == owner, "Only the owner can call this function");
+        bool inheritorExist = false;
 
-        if(waitress.length >=1){
-        for(uint i=0; i<waitress.length; i++){
-           if(waitress[i].walletAddress == walletAddress){
-            waitressExist = true;
-        }    
-       }     
-     }        
+        if(inheritor.length >=1){
+        for (uint i=0; i<inheritor.length; i++) {
+           if(inheritor[i].inheritorAddress == inheritorAddress){
+            inheritorExist = true;
+           }
+
+        }
+       
+        }
+        if(inheritorExist==false){
+           inheritor.push(Inheritor(inheritorAddress,name));
+
+        }
+    }
+
+    //4. remove user
+    function removeInheritor(address payable inheritorAddress) public{
+        if(inheritor.length>=1){
+            for(uint i=0; i<inheritor.length; i++){
+                if(inheritor[i].inheritorAddress==inheritorAddress){
+                    for(uint j=i; j<inheritor.length-1; j++){
+                        inheritor[j]=inheritor[j+1];
+                    }
+                   inheritor.pop();
+                    break;
+                }
+
+            }
+            
+        }
+    }
+
+    //5. view inheritor
+    function viewInheritor() public view returns(Inheritor[] memory) {
+       return inheritor;
+    }
 
 
-    if(waitressExist==false){
-        waitress.push(Waitress(walletAddress,name));
+    //6.distribute inheritor
+    function distrubiteInheritor() public{
+        require(address(this).balance > 0, "Insufficient balance in the contract");
+        if(inheritor.length>=1){
+            uint amount = address(this).balance / inheritor.length;
+            for (uint i=0; i<inheritor.length; i++){
+                transfer(inheritor[i].inheritorAddress,amount);
+            }
+        }
+    }
+    //transfer money
+    function transfer(address payable inheritorAddress,uint amount) internal{
+        inheritorAddress.transfer(amount);
     }
 
 }
-    //4.ลบคนได้
-
-    function removeWaitress(address payable walletAddress) public {
-        if(waitress.length>=1){
-            for (uint i=0; i<waitress.length; i++){
-                if(waitress[i].walletAddress==walletAddress){
-                    for(uint j=i; j<waitress.length-1; j++){
-                        waitress[j]=waitress[j+1];
-                    }
-                        waitress.pop();
-                        break;
-                }
-            }
-        }
-    }
-
-    //5.ดูคนที่ได้รับเงิน
-    function viewWaitress() public  view returns  (Waitress[] memory ){
-        return waitress;
-    }
-
-    //6.จ่ายเงิน
-
-     function distrubiteTips() public {
-        require(address(this).balance >0, "Insufficient balance in the contract");
-        if(waitress.length>=1){
-            uint amount = address(this).balance / waitress.length;
-            for (uint i=0; i<waitress.length; i++){
-                transfer(waitress[i].walletAddress,amount);
-            }
-        }
-
-    }
-        //transfer money
-        function transfer(address payable walletAddress,uint amount) internal {
-            walletAddress.transfer(amount);
-        }
-}   
