@@ -107,7 +107,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"tips.sol": "tips"
+			"inheritance.sol": "tips"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -121,7 +121,7 @@
 		"remappings": []
 	},
 	"sources": {
-		"tips.sol": {
+		"inheritance.sol": {
 			"keccak256": "0xbd556a4fabfb30875dc6760cdf8b790dee186d330ab97a7eaac24bf09c8d4465",
 			"license": "MIT",
 			"urls": [
