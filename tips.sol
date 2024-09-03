@@ -1,88 +1,74 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-contract tips{
-
+contract Inheritance {
     address owner;
-    Waitress[] waitress;
-    
+    Inheritor[] public inheritors;
+    uint256 public lastAlive;
 
-    constructor(){
-        owner = msg.sender;
-    }
-
-    //1.ใส่เงินเข้าไปในกระปุก
-
-    function addtips() payable public {
-
-    }
-    //สามารถรับเงินได้ คือ payable เป็น public
-    //2.สามารถดูเงินในกระปุกได้ว่ามีเท่าไหร่
-
-    function viewtips() public view returns (uint){
-        return address(this).balance;
-    }
-
-    //3.เพิ่มคนที่จะได้รับทิป structure waitress
-    struct Waitress{
-        address payable  walletAddress;
+    struct Inheritor {
+        address payable inheritorAddress;
         string name;
     }
 
-    //3.2 add waitress
-    function addWaitress(address payable  walletAddress,string memory name)public {
-        require(msg.sender == owner,"Only the owner can call this function");
-        bool waitressExist = false;
-
-        if(waitress.length >=1){
-        for(uint i=0; i<waitress.length; i++){
-           if(waitress[i].walletAddress == walletAddress){
-            waitressExist = true;
-        }    
-       }     
-     }        
-
-
-    if(waitressExist==false){
-        waitress.push(Waitress(walletAddress,name));
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can call this function");
+        _;
     }
 
+    constructor() {
+        owner = msg.sender;
+        lastAlive = block.timestamp;
+    }
+
+    // 1. เติมเงินลงในกองทุน
+    function addFunds() external payable {}
+
+    // 2. ดูยอดเงินในกองทุน
+    function viewPoolBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+
+    // 3. เพิ่มผู้รับมรดก
+    function addInheritor(address payable inheritorAddress, string calldata name) external onlyOwner {
+        inheritors.push(Inheritor(inheritorAddress, name));
+    }
+
+    // 4. ลบผู้รับมรดก
+    function removeInheritor(address inheritorAddress) external onlyOwner {
+        for (uint256 i = 0; i < inheritors.length; i++) {
+            if (inheritors[i].inheritorAddress == inheritorAddress) {
+                inheritors[i] = inheritors[inheritors.length - 1];
+                inheritors.pop();
+                break;
+            }
+        }
+    }
+
+    // 5. ดูรายชื่อผู้รับมรดก
+    function viewInheritors() external view returns (Inheritor[] memory) {
+        return inheritors;
+    }
+
+    // 6. แจกจ่ายมรดกให้กับผู้รับมรดก
+    function distributeInheritance() external onlyOwner {
+        require(inheritors.length > 0, "No inheritors to distribute to");
+        require(address(this).balance > 0, "Insufficient balance in the contract");
+
+        uint256 amountPerInheritor = address(this).balance / inheritors.length;
+
+        for (uint256 i = 0; i < inheritors.length; i++) {
+            inheritors[i].inheritorAddress.transfer(amountPerInheritor);
+        }
+    }
+
+    // 7. รักษาสัญญาให้คงอยู่ ("keep alive")
+    function keepAlive() external onlyOwner {
+        lastAlive = block.timestamp;
+    }
+
+    // 8. ฟังก์ชันเพื่ออัตโนมัติในการรักษาสัญญาให้คงอยู่ (optional)
+    function isAlive() external view returns (bool) {
+        return (block.timestamp - lastAlive) < 365 days;
+    }
 }
-    //4.ลบคนได้
-
-    function removeWaitress(address payable walletAddress) public {
-        if(waitress.length>=1){
-            for (uint i=0; i<waitress.length; i++){
-                if(waitress[i].walletAddress==walletAddress){
-                    for(uint j=i; j<waitress.length-1; j++){
-                        waitress[j]=waitress[j+1];
-                    }
-                        waitress.pop();
-                        break;
-                }
-            }
-        }
-    }
-
-    //5.ดูคนที่ได้รับเงิน
-    function viewWaitress() public  view returns  (Waitress[] memory ){
-        return waitress;
-    }
-
-    //6.จ่ายเงิน
-
-     function distrubiteTips() public {
-        require(address(this).balance >0, "Insufficient balance in the contract");
-        if(waitress.length>=1){
-            uint amount = address(this).balance / waitress.length;
-            for (uint i=0; i<waitress.length; i++){
-                transfer(waitress[i].walletAddress,amount);
-            }
-        }
-
-    }
-        //transfer money
-        function transfer(address payable walletAddress,uint amount) internal {
-            walletAddress.transfer(amount);
-        }
-}   
