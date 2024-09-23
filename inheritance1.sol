@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.26;
+pragma solidity ^0.8.26;
 
 contract Inheritance {
-    address owner;
-    Inheritor[] public inheritors;
+    address public owner;
     uint256 public lastAlive;
+    Inheritor[] public inheritors;
 
     struct Inheritor {
         address payable inheritorAddress;
         string name;
+        uint256 percentage; // เปอร์เซ็นต์มรดก
     }
 
     modifier onlyOwner() {
@@ -30,9 +31,12 @@ contract Inheritance {
     }
 
     // 3. เพิ่มผู้รับมรดก
-    function addInheritor(address payable inheritorAddress, string calldata name) external onlyOwner {
-        inheritors.push(Inheritor(inheritorAddress, name));
-    }
+    function addInheritor(address payable inheritorAddress, string calldata name, uint256 percentage) external onlyOwner {
+    require(percentage > 0, "Percentage must be greater than 0");
+    inheritors.push(Inheritor(inheritorAddress, name, percentage));
+}
+
+
 
     // 4. ลบผู้รับมรดก
     function removeInheritor(address inheritorAddress) external onlyOwner {
@@ -50,15 +54,21 @@ contract Inheritance {
         return inheritors;
     }
 
-    // 6. แจกจ่ายมรดกให้กับผู้รับมรดก
+    // 6. แจกจ่ายมรดกตามเปอร์เซ็นต์ที่กำหนด
     function distributeInheritance() external onlyOwner {
-        require(inheritors.length > 0, "No inheritors to distribute to");
-        require(address(this).balance > 0, "Insufficient balance in the contract");
+        uint256 totalBalance = address(this).balance;
+        uint256 totalPercentage = 0;
 
-        uint256 amountPerInheritor = address(this).balance / inheritors.length;
-
+        // ตรวจสอบว่าผู้รับมรดกทั้งหมดมีเปอร์เซ็นต์รวมเป็น 100%
         for (uint256 i = 0; i < inheritors.length; i++) {
-            inheritors[i].inheritorAddress.transfer(amountPerInheritor);
+            totalPercentage += inheritors[i].percentage;
+        }
+        require(totalPercentage == 100, "Total percentage must be 100");
+
+        // แจกจ่ายเงินมรดกตามเปอร์เซ็นต์
+        for (uint256 i = 0; i < inheritors.length; i++) {
+            uint256 amount = (totalBalance * inheritors[i].percentage) / 100;
+            inheritors[i].inheritorAddress.transfer(amount);
         }
     }
 
@@ -67,7 +77,7 @@ contract Inheritance {
         lastAlive = block.timestamp;
     }
 
-    // 8. ฟังก์ชันเพื่ออัตโนมัติในการรักษาสัญญาให้คงอยู่ (optional)
+    // 8. ตรวจสอบว่ามีการ keep alive
     function isAlive() external view returns (bool) {
         return (block.timestamp - lastAlive) < 365 days;
     }

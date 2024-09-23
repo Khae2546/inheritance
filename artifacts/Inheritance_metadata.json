@@ -28,6 +28,11 @@
 						"internalType": "string",
 						"name": "name",
 						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "percentage",
+						"type": "uint256"
 					}
 				],
 				"name": "addInheritor",
@@ -61,6 +66,11 @@
 						"internalType": "string",
 						"name": "name",
 						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "percentage",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -100,6 +110,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -127,6 +150,11 @@
 								"internalType": "string",
 								"name": "name",
 								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "percentage",
+								"type": "uint256"
 							}
 						],
 						"internalType": "struct Inheritance.Inheritor[]",
@@ -164,7 +192,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"tips.sol": "Inheritance"
+			"inheritance1.sol": "Inheritance"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -178,12 +206,12 @@
 		"remappings": []
 	},
 	"sources": {
-		"tips.sol": {
-			"keccak256": "0xe25fa554334411bc33b2b4b547159decb313ed5df6c1f5046ff9d6364ecf76b6",
+		"inheritance1.sol": {
+			"keccak256": "0x6cad99e0c3edb2370bff02059fc4f33f3df697f75c8b76776cca4a3dbf0e7777",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://45cd5cdb3ade7236181b12655c379808f061d48ba66243f80342b8f7842f331e",
-				"dweb:/ipfs/QmSEPY9zKsGfedWy37Y39MAEt6Yfvv3gWk8BnXhLN9JwbA"
+				"bzz-raw://2851ae0c44696aa6d7ff447730318d388e63dd9cd7d327cb34c13f37c9e07dee",
+				"dweb:/ipfs/Qmbk6zSt4x6zk1QQVz3e8NJKiDZexA6KWu8MRLw3qqv6kg"
 			]
 		}
 	},
